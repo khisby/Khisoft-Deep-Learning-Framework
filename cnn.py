@@ -3,15 +3,13 @@ from khisoft.layers import Model, Conv2d, Relu, Maxpooling2D, Flatten, Dense
 # from khisoft.output_layers import Softmax
 # from khisoft.loss import CategoricalCrossEntropy
 # from khisoft.optimizer import SGD
-
 import matplotlib.pyplot as plt
 
 dataset = ImageDataGenerator("datasets")
 X_train, y_train, X_test, y_test = dataset.load_dataset(rescale=255)
 y_train_oneHot, y_test_oneHot = dataset.load_class_oneHot()
-#
-# plt.imshow(X_train[0], cmap='gray')
-# plt.show()
+plt.imshow(X_train[0], cmap='gray')
+plt.show()
 
 model = Model([
     Conv2d(padding=1,stride=2),

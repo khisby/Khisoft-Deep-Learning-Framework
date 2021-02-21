@@ -251,41 +251,78 @@ class Dense:
         self.hidden_layer.insert(0, X_input.shape[1])
         self.hidden_layer.append(len(y_input[0]))
 
-
+        # print(self.hidden_layer)
         # Inisialisasi bobot dan bias
         for i_layer in range(1, len(self.hidden_layer)):
             self.weight[i_layer] = np.random.randn(self.hidden_layer[i_layer], self.hidden_layer[i_layer-1]) / np.sqrt(self.hidden_layer[i_layer-1])
             self.bias[i_layer] = np.zeros((self.hidden_layer[i_layer], 1))
 
+        # print(self.weight[4].shape)
 
-        for iterasi in range(self.epochs):
-        # for iterasi in range(1):
+
+        # for iterasi in range(self.epochs):
+        for iterasi in range(1):
             result_sementara_perkalian_dan_tambah_neuron = {}
-            result_sementara_sigmoid_neuron = {}
-            result_sementara_weight_lama = {}
+            result_sementara_aktivasi = {}
+            result_sementara_weight = {}
+            result_weight_baru = {}
+            result_bias_baru = {}
+
+            n = np.array(X_input).shape[1]
+
 
             #Forward Propagation
             X_input_transpose = np.array(X_input).T
             for i_layer in range(1, len(self.hidden_layer)):
-                if(i_layer == len(self.hidden_layer)):
-                    # Jika ini layer terakhir
-                    # Perkalian dot product input dan weight ditambah bias
-                    result = np.dot(self.weight[int(i_layer)], X_input_transpose) + self.bias[int(i_layer)]
-                    #fungsi aktifasi sigmoid
-                    X_input_transpose = DenseSupport.sigmoid(result)
+
+                # Perkalian dot product input dan weight ditambah bias
+                result = np.dot(self.weight[int(i_layer)], X_input_transpose) + self.bias[int(i_layer)]
+                result_sementara_perkalian_dan_tambah_neuron[int(i_layer)] = result
+
+                if(i_layer == len(self.hidden_layer)-1):
+                    # Jika ini layer terakhir fungsi aktifasi sigmoid
+                    X_input_transpose = DenseSupport.softmax(result)
                 else:
                     #Jika ini bukan layer awal dan bukan layer akhir
-                    # Perkalian dot product input dan weight ditambah bias
-                    result = np.dot(self.weight[int(i_layer)], X_input_transpose) + self.bias[int(i_layer)]
-                    X_input_transpose = DenseSupport.softmax(result)
+                    X_input_transpose = DenseSupport.sigmoid(result)
+
+                result_sementara_aktivasi[int(i_layer)] = X_input_transpose
+                result_sementara_weight[int(i_layer)] = self.weight[int(i_layer)]
 
 
             # Loss function Categorical Cross Entropy
-            loss_input = DenseSupport.loss(X_input_transpose, y_input)
-
+            loss_input = DenseSupport.loss(X_input_transpose.T, y_input)
+            print(loss_input)
 
             # Menghitung Akurasi
-            accuraacy_input = DenseSupport.accuracy(X_input_transpose, y_input)
+            accuraacy_input = DenseSupport.accuracy(X_input_transpose.T, y_input)
+            print(accuraacy_input)
+
+            # Loss derivative
+            # loss_derivative = DenseSupport.loss_derivative(X_input_transpose.T, y_input)
+            # print(loss_derivative.shape)
+
+            #Backpropagation
+            A = result_sementara_aktivasi[len(self.hidden_layer)-1]
+            dz = A.T - y_input
+            result_weight_baru[len(self.hidden_layer)-1] = np.dot(dz, result_sementara_aktivasi[len(self.hidden_layer)-1]) / n
+            result_bias_baru[len(self.hidden_layer) - 1] = np.sum(dz, axis=1, keepdims=True)
+            # print(result_weight_baru[len(self.hidden_layer)-1])
+
+            result_sementara_aktivasi[0] = np.array(X_input).T
+
+            # input_derivative = loss_derivative.copy()
+            for i_layer in range(len(self.hidden_layer)-1, 0, -1):
+                pass
+                # print(i_layer)
+                # print(np.dot(self.weight[int(i_layer)], input_derivative.T))
+                # weight_derivative = np.dot(self.weight[int(i_layer)].T, input_derivative)
+                # bias_derivative = np.sum(input_derivative, axis=0, keepdims=True)
+                # print(input_derivative.shape)
+                # print(weight_derivative.shape)
+                # input_derivative = np.dot(input_derivative, weight_derivative.T)
+
+            # print(input_derivative)
 
         return X_input, X_validation
 
@@ -295,17 +332,32 @@ class DenseSupport:
 
     def softmax(X):
         eksponen = np.exp(X - np.max(X))
-        return eksponen / np.sum(eksponen, axis=0, keepdims=True)
+        return eksponen / np.sum(eksponen, axis=1, keepdims=True)
+
+    def get_cost(X,y):
+        prediksi = np.clip(X, 1e-7, 1 - 1e-7)
+        correct_confidences = np.sum(X * y, axis=1)
+        loss = -np.log(correct_confidences)
+        return loss
 
     def accuracy(X, y):
+        loss = DenseSupport.get_cost(X,y)
         prediksi = np.argmax(X, axis=1)
         kelas_sebenarnya = np.argmax(y, axis=1)
         akurasi = np.mean(prediksi == kelas_sebenarnya)
         return akurasi
 
     def loss(X, y):
-        epsilon = 1e-10
-        prediksi = np.clip(X, epsilon, 1. - epsilon)
-        N = prediksi.shape[0]
-        loss = -np.sum(np.sum(np.asarray(y).T * np.log(prediksi + 1e-5))) / N
+        loss = DenseSupport.get_cost(X,y)
+        loss = np.mean(loss)
+        # loss = -np.mean(y * np.log(X.T))
         return loss
+
+    def loss_derivative(X, y):
+        sample = len(X)
+
+        y_T = np.argmax(y, axis=1)
+        input_derivative_dari_loss = X.copy()
+        input_derivative_dari_loss[range(sample), y_T] -= 1
+        input_derivative_dari_loss = input_derivative_dari_loss / sample
+        return input_derivative_dari_loss
