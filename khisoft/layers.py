@@ -88,7 +88,7 @@ class Model:
                                                               train=True)
                 self.input_output = input_output
                 self.validation_output = validation_output
-                print(acc)
+                # print(acc)
                 self.acc = acc
                 self.loss = loss
 
@@ -102,6 +102,29 @@ class Model:
 
         print()
         print("Proses Training Selesai...")
+
+    def pred(self, X_input=[], callback=[]):
+
+        for layer in self.layers:
+            try:
+                input_X = self.input_output_pred
+            except:
+                input_X = X_input
+
+            if type(layer).__name__ == "Dense":
+                # print(self.input_output_pred)
+                _, _, input_output, _ = layer.train(X_input=input_X, y_input=[],
+                                                              X_validation=[], y_validation=[],
+                                                              train=False)
+                # print(input_output)
+                self.input_output_pred = input_output
+            else:
+                input_output, _ = layer.train(X_input=input_X, y_input=[], X_validation=[], y_validation=[], train=False)
+                self.input_output_pred = input_output
+
+        return self.input_output_pred
+        # print()
+        # print("Proses Training Selesai...")
 
 class Conv2d:
     def __init__(self, padding=0, stride=1):
@@ -164,17 +187,25 @@ class Conv2d:
 
             arr_hasil_perkalian_konvolusi.append(hasil_perkalian_konvolusi)
         return arr_hasil_perkalian_konvolusi
-    def train(self, X_input, y_input, X_validation, y_validation, train=True):
+
+    def train(self, X_input=[], y_input=[], X_validation=[], y_validation=[], train=True):
         hasil_konvolusi_input = Conv2d.convolution(self, gambar_input = X_input, train=train)
-        hasil_konvolusi_validation = Conv2d.convolution(self, gambar_input=X_validation, train=train)
-        return np.array(hasil_konvolusi_input), np.array(hasil_konvolusi_validation)
+        if(train):
+            hasil_konvolusi_validation = Conv2d.convolution(self, gambar_input=X_validation, train=train)
+            return np.array(hasil_konvolusi_input), np.array(hasil_konvolusi_validation)
+        else:
+            return np.array(hasil_konvolusi_input), np.array([])
+
 
 class Relu:
     def __init__(self):
         pass
 
-    def train(self, X_input, y_input, X_validation, y_validation, train=True):
-        return np.maximum(0, X_input), np.maximum(0, X_validation)
+    def train(self, X_input=[], y_input=[], X_validation=[], y_validation=[], train=True):
+        if(train):
+            return np.maximum(0, X_input), np.maximum(0, X_validation)
+        else:
+            return np.maximum(0, X_input), np.asarray([])
 
 class Maxpooling2D:
     def __init__(self, ukuran_filter=2, stride=1):
@@ -218,25 +249,30 @@ class Maxpooling2D:
 
             arr_hasil_perkalian_konvolusi.append(hasil_perkalian_konvolusi)
         return arr_hasil_perkalian_konvolusi
-    def train(self, X_input, y_input, X_validation, y_validation, train=True):
+    def train(self, X_input=[], y_input=[], X_validation=[], y_validation=[], train=True):
         hasil_konvolusi_input = Maxpooling2D.convolution(self, gambar_input = X_input, train=train)
-        hasil_konvolusi_validation = Maxpooling2D.convolution(self, gambar_input=X_validation, train=train)
-        return np.array(hasil_konvolusi_input), np.array(hasil_konvolusi_validation)
-
+        if(train):
+            hasil_konvolusi_validation = Maxpooling2D.convolution(self, gambar_input=X_validation, train=train)
+            return np.array(hasil_konvolusi_input), np.array(hasil_konvolusi_validation)
+        else:
+            return np.array(hasil_konvolusi_input), np.array([])
 class Flatten:
     def __init__(self):
         pass
 
     def train(self, X_input, y_input, X_validation, y_validation, train=True):
         X_input_flatten = []
-        for train in X_input:
-            X_input_flatten.append(np.array(train).flatten())
+        for data_train in X_input:
+            X_input_flatten.append(np.array(data_train).flatten())
 
-        X_validation_flatten = []
-        for validation in X_validation:
-            X_validation_flatten.append(np.array(validation).flatten())
+        if(train):
+            X_validation_flatten = []
+            for validation in X_validation:
+                X_validation_flatten.append(np.array(validation).flatten())
 
-        return np.array(X_input_flatten), np.array(X_validation_flatten)
+            return np.array(X_input_flatten), np.array(X_validation_flatten)
+        else:
+            return np.array(X_input_flatten), np.array([])
 
 class Dense:
     def __init__(self, hidden_layer=[]):
@@ -248,20 +284,26 @@ class Dense:
         self.epochs = epochs
         self.callback = callback
 
-    def train(self, X_input, y_input, X_validation, y_validation, train=True):
+    def train(self, X_input=[], y_input=[], X_validation=[], y_validation=[], train=True):
         print()
 
-        # Menambah layer input sesuai jumlah output dari flatten
-        self.hidden_layer.insert(0, X_input.shape[1])
-        self.hidden_layer.append(len(y_input[0]))
+        if (train == False):
+            self.epochs = 1
 
-        # print(self.hidden_layer)
-        # Inisialisasi bobot dan bias
-        for i_layer in range(1, len(self.hidden_layer)):
-            self.weight[i_layer] = np.random.randn(self.hidden_layer[i_layer], self.hidden_layer[i_layer-1]) / np.sqrt(self.hidden_layer[i_layer-1])
-            self.bias[i_layer] = np.zeros((self.hidden_layer[i_layer], 1))
-            # print(self.weight[i_layer].shape)
-            # print(self.bias[i_layer].shape)
+        if(train):
+            # Menambah layer input sesuai jumlah output dari flatten
+            self.hidden_layer.insert(0, X_input.shape[1])
+            self.hidden_layer.append(len(y_input[0]))
+
+            # print(self.hidden_layer)
+            # Inisialisasi bobot dan bias
+            for i_layer in range(1, len(self.hidden_layer)):
+                self.weight[i_layer] = np.random.randn(self.hidden_layer[i_layer],
+                                                       self.hidden_layer[i_layer - 1]) / np.sqrt(
+                    self.hidden_layer[i_layer - 1])
+                self.bias[i_layer] = np.zeros((self.hidden_layer[i_layer], 1))
+                # print(self.weight[i_layer].shape)
+                # print(self.bias[i_layer].shape)
 
         loss = []
         acc = []
@@ -298,72 +340,77 @@ class Dense:
                 result_sementara_aktivasi[int(i_layer)+1] = X_input_transpose
                 result_sementara_weight[int(i_layer)+1] = self.weight[int(i_layer)+1]
 
+            if(train):
+                # Loss function Categorical Cross Entropy
+                loss_input = DenseSupport.loss(X_input_transpose.T, y_input)
+                loss.append(loss_input)
+
+                # Menghitung Akurasi
+                accuraacy_input = DenseSupport.accuracy(X_input_transpose.T, y_input)
+                acc.append(accuraacy_input)
 
 
-            # Loss function Categorical Cross Entropy
-            loss_input = DenseSupport.loss(X_input_transpose.T, y_input)
-            loss.append(loss_input)
+                # Loss derivative
+                # loss_derivative = DenseSupport.loss_derivative(X_input_transpose.T, y_input)
+                # print(loss_derivative.shape)
 
-            # Menghitung Akurasi
-            accuraacy_input = DenseSupport.accuracy(X_input_transpose.T, y_input)
-            acc.append(accuraacy_input)
+                # Backpropagation
+                # print(result_sementara_aktivasi)
+                A = result_sementara_aktivasi[len(self.hidden_layer) - 1]
+                # print(A.shape)
+                dz = A.T - y_input
+                # print(dz.T.shape)
+                result_weight_baru[len(self.hidden_layer) - 1] = np.dot(dz.T, result_sementara_aktivasi[
+                    len(self.hidden_layer) - 2].T) / n
+                result_bias_baru[len(self.hidden_layer) - 1] = np.sum(dz.T, axis=1, keepdims=True)
+                # print(result_weight_baru[len(self.hidden_layer)-1].shape)
 
-            # Loss derivative
-            # loss_derivative = DenseSupport.loss_derivative(X_input_transpose.T, y_input)
-            # print(loss_derivative.shape)
+                dAPrev = result_sementara_weight[len(self.hidden_layer) - 1].T.dot(dz.T)
 
-            #Backpropagation
-            # print(result_sementara_aktivasi)
-            A = result_sementara_aktivasi[len(self.hidden_layer)-1]
-            # print(A.shape)
-            dz = A.T - y_input
-            # print(dz.T.shape)
-            result_weight_baru[len(self.hidden_layer)-1] = np.dot(dz.T, result_sementara_aktivasi[len(self.hidden_layer)-2].T) / n
-            result_bias_baru[len(self.hidden_layer)-1] = np.sum(dz.T, axis=1, keepdims=True)
-            # print(result_weight_baru[len(self.hidden_layer)-1].shape)
+                result_sementara_aktivasi[0] = np.array(X_input).T
+                # input_derivative = loss_derivative.copy()
 
-            dAPrev = result_sementara_weight[len(self.hidden_layer)-1].T.dot(dz.T)
+                # print(result_weight_baru)
+                for i_layer in range(len(self.hidden_layer) - 2, 0, -1):
+                    # print(i_layer)
+                    # print(result_sementara_perkalian_dan_tambah_neuron[int(i_layer)].shape)
+                    # print(result_sementara_perkalian_dan_tambah_neuron)
 
-            result_sementara_aktivasi[0] = np.array(X_input).T
-            # input_derivative = loss_derivative.copy()
+                    s = DenseSupport.sigmoid(result_sementara_perkalian_dan_tambah_neuron[int(i_layer)], backprop=True)
+                    dz = dAPrev * (s * (1 - s))
 
-            # print(result_weight_baru)
-            for i_layer in range(len(self.hidden_layer)-2, 0, -1):
-                # print(i_layer)
-                # print(result_sementara_perkalian_dan_tambah_neuron[int(i_layer)].shape)
-                # print(result_sementara_perkalian_dan_tambah_neuron)
+                    # print(result_sementara_aktivasi[int(i_layer)-1].shape)
+                    # print(dz.shape)
+                    result_weight_baru[int(i_layer)] = 1. / n * np.dot(dz,
+                                                                       result_sementara_aktivasi[int(i_layer) - 1].T)
+                    result_bias_baru[int(i_layer)] = 1. / n * np.sum(dz, axis=1, keepdims=True)
 
-                s = DenseSupport.sigmoid(result_sementara_perkalian_dan_tambah_neuron[int(i_layer)], backprop=True)
-                dz = dAPrev * (s * (1-s))
+                    if i_layer > 1:
+                        dAPrev = result_sementara_weight[int(i_layer)].T.dot(dz)
 
-                # print(result_sementara_aktivasi[int(i_layer)-1].shape)
-                # print(dz.shape)
-                result_weight_baru[int(i_layer)] = 1. / n * np.dot(dz, result_sementara_aktivasi[int(i_layer)-1].T)
-                result_bias_baru[int(i_layer)] = 1. / n * np.sum(dz, axis=1, keepdims=True)
+                    # print(i_layer)
+                    # print(np.dot(self.weight[int(i_layer)], input_derivative.T))
+                    # weight_derivative = np.dot(self.weight[int(i_layer)].T, input_derivative)
+                    # bias_derivative = np.sum(input_derivative, axis=0, keepdims=True)
+                    # print(input_derivative.shape)
+                    # print(weight_derivative.shape)
+                    # input_derivative = np.dot(input_derivative, weight_derivative.T)
 
-                if i_layer > 1 :
-                    dAPrev = result_sementara_weight[int(i_layer)].T.dot(dz)
+                # print(input_derivative)
 
-                # print(i_layer)
-                # print(np.dot(self.weight[int(i_layer)], input_derivative.T))
-                # weight_derivative = np.dot(self.weight[int(i_layer)].T, input_derivative)
-                # bias_derivative = np.sum(input_derivative, axis=0, keepdims=True)
-                # print(input_derivative.shape)
-                # print(weight_derivative.shape)
-                # input_derivative = np.dot(input_derivative, weight_derivative.T)
+                # print(len(self.weight))
+                # print(len(self.weight))
+                for i_layer in range(1, len(self.hidden_layer)):
+                    # print(i_layer)
+                    # print(self.weight[int(i_layer)].shape)
+                    # print(result_weight_baru[int(i_layer)].shape)
+                    self.weight[int(i_layer)] = self.weight[int(i_layer)] - 0.01 * result_weight_baru[int(i_layer)]
+                    self.bias[int(i_layer)] = self.bias[int(i_layer)] - 0.01 * result_bias_baru[int(i_layer)]
 
-            # print(input_derivative)
-
-            # print(len(self.weight))
-            # print(len(self.weight))
-            for i_layer in range(1, len(self.hidden_layer)):
-                # print(i_layer)
-                # print(self.weight[int(i_layer)].shape)
-                # print(result_weight_baru[int(i_layer)].shape)
-                self.weight[int(i_layer)] = self.weight[int(i_layer)] - 0.01 * result_weight_baru[int(i_layer)]
-                self.bias[int(i_layer)] = self.bias[int(i_layer)] - 0.01 * result_bias_baru[int(i_layer)]
-
-        return acc, loss, X_input, X_validation
+        if(train):
+            return acc, loss, X_input, X_validation
+        else:
+            return [], [], X_input_transpose, np.array([])
 
 class DenseSupport:
     def sigmoid(X,backprop = True):
@@ -374,7 +421,7 @@ class DenseSupport:
 
     def softmax(X):
         eksponen = np.exp(X - np.max(X))
-        return eksponen / np.sum(eksponen, axis=1, keepdims=True)
+        return eksponen / np.sum(eksponen, axis=0, keepdims=True)
 
     def get_cost(X,y):
         prediksi = np.clip(X, 1e-7, 1 - 1e-7)

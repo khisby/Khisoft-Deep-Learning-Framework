@@ -19,15 +19,12 @@ test_x = np.array(images)
 test_y = np.array(labels)
 
 
-train_x = train_x / 255
-test_x = test_x / 255
-
-train_x = train_x / 255
-test_x = test_x / 255
+train_x = train_x[:100] / 255
+test_x = test_x[:100] / 255
 
 enc = OneHotEncoder(sparse=False, categories='auto')
-train_y = enc.fit_transform(train_y.reshape(len(train_y), -1))
-test_y = enc.fit_transform(test_y.reshape(len(test_y), -1))
+train_y = enc.fit_transform(train_y[:100].reshape(len(train_y[:100]), -1))
+test_y = enc.fit_transform(test_y[:100].reshape(len(test_y[:100]), -1))
 
 train_x_jadi = []
 for i in train_x:
@@ -47,11 +44,17 @@ test_x_jadi = np.asarray(test_x_jadi)
 
 
 model = Model([
-    Conv2d(padding=1,stride=1),
-    Maxpooling2D(ukuran_filter=2, stride=1),
+    Conv2d(padding=1,stride=2),
+    Maxpooling2D(ukuran_filter=2, stride=2),
     Flatten(),
     Dense([11]),
 ])
+
 model.summary(input_shape = (28,28))
 # # model.compile(loss=CategoricalCrossEntropy(), optimizer=SGD(lr=0.1, momentum=0.9), output_layer=Softmax())
 model.fit(epochs=200, X_input=train_x_jadi, y_input=train_y, X_validation=test_x_jadi, y_validation=test_y, callback=['plot_loss','plot_accuraacy'])
+predict = model.pred(X_input=np.array([train_x_jadi[0]]))
+predict_arg_max = predict.argmax(axis=0)
+# print("====  CNN ==== ")
+# print(predict)
+# print(predict_arg_max)
