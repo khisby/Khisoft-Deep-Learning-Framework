@@ -40,8 +40,10 @@ class Model:
         y_input = np.array([[[random.random() for i in range(X)] for j in range(X)]])
         X_validation = np.array([[[random.random() for i in range(X)] for j in range(X)]])
         y_validation = np.array([[[random.random() for i in range(X)] for j in range(X)]])
+        teks = "" + "\n"
 
         print("Berikut adalah summary dari model dengan 1 gambar ukuran " + str(input_shape))
+        teks = teks + "Ukuran Gambar adalah " + str(input_shape) + "\n"
         for layer in self.layers:
             try:
                 input_X = input_output
@@ -52,6 +54,8 @@ class Model:
 
             if type(layer).__name__ == "Dense":
                 print("Dense with hidden layer = " + str(layer.hidden_layer))
+                teks = teks + "Dense with hidden layer = " + str(layer.hidden_layer) + "\n"
+
             else:
                 input_output, validation_output = layer.train(X_input=input_X, y_input=y_input,
                                                                 X_validation=validation_X, y_validation=y_validation, train=False)
@@ -59,6 +63,8 @@ class Model:
                 validation_output = validation_output
 
                 print(type(layer).__name__, "output shape = " + str(input_output.shape))
+                teks = teks + str(type(layer).__name__) + " output shape = " + str(input_output.shape) + "\n"
+        return teks
 
     def compile(self):
         pass
@@ -104,7 +110,6 @@ class Model:
         print("Proses Training Selesai...")
 
     def pred(self, X_input=[], callback=[]):
-
         for layer in self.layers:
             try:
                 input_X = self.input_output_pred
@@ -123,8 +128,6 @@ class Model:
                 self.input_output_pred = input_output
 
         return self.input_output_pred
-        # print()
-        # print("Proses Training Selesai...")
 
 class Conv2d:
     def __init__(self, padding=0, stride=1):
@@ -285,7 +288,6 @@ class Dense:
         self.callback = callback
 
     def train(self, X_input=[], y_input=[], X_validation=[], y_validation=[], train=True):
-        print()
 
         if (train == False):
             self.epochs = 1
@@ -304,6 +306,10 @@ class Dense:
                 self.bias[i_layer] = np.zeros((self.hidden_layer[i_layer], 1))
                 # print(self.weight[i_layer].shape)
                 # print(self.bias[i_layer].shape)
+        else:
+            self.weight = np.load('model/weight.npy', allow_pickle=True).item()
+            self.bias = np.load('model/bias.npy', allow_pickle=True).item()
+            self.hidden_layer = np.load('model/hidden_layer.npy', allow_pickle=True).tolist()
 
         loss = []
         acc = []
@@ -408,6 +414,9 @@ class Dense:
                     self.bias[int(i_layer)] = self.bias[int(i_layer)] - 0.01 * result_bias_baru[int(i_layer)]
 
         if(train):
+            np.save('model/weight', self.weight)
+            np.save('model/bias', self.bias)
+            np.save('model/hidden_layer', self.hidden_layer)
             return acc, loss, X_input, X_validation
         else:
             return [], [], X_input_transpose, np.array([])

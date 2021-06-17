@@ -18,7 +18,8 @@ class ImageDataGenerator:
 
         for label in labels:
             for file in os.listdir(os.path.join(lokasi, jenis, label)):
-                gambar = cv2.imread(os.path.join(lokasi, jenis, label, file), 0)
+                gambar = cv2.imread(os.path.join(lokasi, jenis, label, file))
+                gambar = cv2.cvtColor(gambar, cv2.COLOR_BGR2GRAY)
 
                 if rescale == None:
                     X.append(gambar)
@@ -32,14 +33,14 @@ class ImageDataGenerator:
     def load_dataset(self, rescale=1):
         x_train, y_train = ImageDataGenerator.ambil_gambar(lokasi=self.lokasi, jenis="train", rescale=rescale)
         x_test, y_test = ImageDataGenerator.ambil_gambar(lokasi=self.lokasi, jenis="test", rescale=rescale)
-
         self.y_train = y_train
         self.y_test = y_test
 
         return x_train, y_train, x_test, y_test
 
     def load_class(self):
-        return self.class_indicies
+        labels = os.listdir(os.path.join(self.lokasi, "train"))
+        return labels
 
     def generate_oneHot(labels, kelas):
         arr_oneHot = []
