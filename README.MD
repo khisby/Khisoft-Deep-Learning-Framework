@@ -28,11 +28,9 @@ ini adalah mini framework untuk membantu dalam membangun model deep learning :sm
 
 ##Wish to add
 1. Compile method with loss, optimizer and output layer
-2. Dense with activation Layer
-3. Callback (save best weight only, live plot loss and accuraacy, minimal accuracy and validation accuracy)
-4. Add Regularization
-5. Add Normalization
-6. Initial weight
-7. Add more ability to calculate Tensor
+2. Callback (save best weight only, live plot loss and accuraacy, minimal accuracy and validation accuracy)
+3. Add Regularization
+4. Add Normalization
+5. Add more ability to calculate Tensor
 
 Feel free to Pull Request :heart:
