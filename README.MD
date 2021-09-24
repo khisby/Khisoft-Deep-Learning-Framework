@@ -34,3 +34,20 @@ ini adalah mini framework untuk membantu dalam membangun model deep learning :sm
 5. Add more ability to calculate Tensor
 
 Feel free to Pull Request :heart:
+
+#Khisoft - Sign Language Translator
+##Download and Run
+[Click this link to download](https://github.com/khisby/Khisoft-Deep-Learning-Framework/releases/tag/v1.0) and then click on Khisoft.-.Sign.Language.Translator.zip read the description for guide. 
+
+##Screenshot
+###Create Datasets
+![Create Datasets](screenshot/dataset.png)
+###Training
+![Training](screenshot/training.png)
+###Testing
+![Testing](screenshot/testing.png)
+###Plot Accuracy and Loss
+![Plot Acc and Loss](screenshot/plot.png)
+###Flow System
+![Flow System](screenshot/flowsystem.png)
+![Detail Flow System](screenshot/detail-flowsystem.png)
