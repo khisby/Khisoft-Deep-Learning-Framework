@@ -1,2 +1,9 @@
 .idea/
 datasets/
+__pycache__/
+
+_backup2/
+
+_backup3/
+
+_backup/
