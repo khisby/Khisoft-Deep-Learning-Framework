@@ -1,8 +1,8 @@
-#Khisoft Deep Learning Framework
-##Description
+# Khisoft Deep Learning Framework
+## Description
 ini adalah mini framework untuk membantu dalam membangun model deep learning :smile: .
 
-##Requirement Package
+## Requirement Package
 - numpy
 - os
 - random
@@ -10,7 +10,7 @@ ini adalah mini framework untuk membantu dalam membangun model deep learning :sm
 - cv2
 - matplotlib
 
-##Features
+## Features
 1. Model Sequential or with add method
 2. Convolution2D Layer
 3. Maxpooling2D layer
@@ -26,7 +26,7 @@ ini adalah mini framework untuk membantu dalam membangun model deep learning :sm
 14. Plot Accuracy and Loss
 
 
-##Wish to add
+## Wish to add
 1. Compile method with loss, optimizer and output layer
 2. Callback (save best weight only, live plot loss and accuraacy, minimal accuracy and validation accuracy)
 3. Add Regularization
@@ -35,19 +35,19 @@ ini adalah mini framework untuk membantu dalam membangun model deep learning :sm
 
 Feel free to Pull Request :heart:
 
-#Khisoft - Sign Language Translator
-##Download and Run
+# Khisoft - Sign Language Translator
+## Download and Run
 [Click this link to download](https://github.com/khisby/Khisoft-Deep-Learning-Framework/releases/tag/v1.0) and then click on Khisoft.-.Sign.Language.Translator.zip read the description for guide. 
 
-##Screenshot
-###Create Datasets
+## Screenshot
+### Create Datasets
 ![Create Datasets](screenshot/dataset.png)
-###Training
+### Training
 ![Training](screenshot/training.png)
-###Testing
+### Testing
 ![Testing](screenshot/testing.png)
-###Plot Accuracy and Loss
+### Plot Accuracy and Loss
 ![Plot Acc and Loss](screenshot/plot.png)
-###Flow System
+### Flow System
 ![Flow System](screenshot/flowsystem.png)
 ![Detail Flow System](screenshot/detail-flowsystem.png)
