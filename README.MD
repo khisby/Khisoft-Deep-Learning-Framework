@@ -1,7 +1,6 @@
 #Khisoft Deep Learning Framework
 ##Description
-ini adalah mini framework untuk membantu dalam membangun model deep learning. 
-dibuat dengan sangat mirip dengan tensorflow :smile:
+ini adalah mini framework untuk membantu dalam membangun model deep learning :smile: .
 
 ##Requirement Package
 - numpy
@@ -9,6 +8,7 @@ dibuat dengan sangat mirip dengan tensorflow :smile:
 - random
 - sys
 - cv2
+- matplotlib
 
 ##Features
 1. Model Sequential or with add method
@@ -20,16 +20,19 @@ dibuat dengan sangat mirip dengan tensorflow :smile:
 7. Summary Model
 8. Training with Validation
 9. ImageDataGenerator (load from test and train folder)
-10. class to one-hot encoding
+10. Class to one-hot encoding
+11. Auto save and load model weight, bias, architecture model and class mapping
+12. Predict method 
+14. Plot Accuracy and Loss
+
 
 ##Wish to add
 1. Compile method with loss, optimizer and output layer
-2. Predict method
-3. Dense with activation Layer
-4. Callback (save best weight only, live plot loss and accuraacy, minimal accuracy and validation accuracy)
-5. Add Regularization
-6. Add Normalization
-7. Initial weight
-9. Add more ability to calculate Tensor
+2. Dense with activation Layer
+3. Callback (save best weight only, live plot loss and accuraacy, minimal accuracy and validation accuracy)
+4. Add Regularization
+5. Add Normalization
+6. Initial weight
+7. Add more ability to calculate Tensor
 
 Feel free to Pull Request :heart:

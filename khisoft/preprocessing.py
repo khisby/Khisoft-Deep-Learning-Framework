@@ -35,6 +35,7 @@ class ImageDataGenerator:
         x_test, y_test = ImageDataGenerator.ambil_gambar(lokasi=self.lokasi, jenis="test", rescale=rescale)
         self.y_train = y_train
         self.y_test = y_test
+        np.save("model/class", self.load_class())
 
         return x_train, y_train, x_test, y_test
 

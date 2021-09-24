@@ -4,6 +4,7 @@ try:
     import os
     import random
     import sys
+    import matplotlib.pyplot as plt
 except:
     print("Library tidak ditemukan !")
     print("Pastikan library cv2, os, numpy, random, sys sudah terinstall")
@@ -68,6 +69,21 @@ class Model:
 
     def compile(self):
         pass
+
+    def get_acc(self):
+        return self.acc
+
+    def get_loss(self):
+        return self.loss
+
+    def plot(self):
+        plt.plot(self.get_acc())
+        plt.plot(self.get_loss())
+        plt.title('Model Accuracy Loss')
+        plt.ylabel('accuracy')
+        plt.xlabel('loss')
+        plt.legend(['ACC', 'LOSS'], loc='upper left')
+        plt.show()
 
     def fit(self, X_input=[], y_input=[], X_validation=[], y_validation=[], epochs=10, callback=[]):
         self.X_input = X_input
@@ -281,18 +297,18 @@ class Dense:
     def __init__(self, hidden_layer=[]):
         self.hidden_layer = hidden_layer
         self.weight = {}
-        self.bias = {}
+        self.bias = {}  
 
     def set_params(self, epochs=10, callback=[]):
         self.epochs = epochs
         self.callback = callback
 
     def train(self, X_input=[], y_input=[], X_validation=[], y_validation=[], train=True):
-
         if (train == False):
             self.epochs = 1
 
         if(train):
+            print()
             # Menambah layer input sesuai jumlah output dari flatten
             self.hidden_layer.insert(0, X_input.shape[1])
             self.hidden_layer.append(len(y_input[0]))
@@ -313,6 +329,10 @@ class Dense:
 
         loss = []
         acc = []
+        ulangAwal = 0
+        ulangAkhir = 100
+
+        # print(self.callback)
         for iterasi in range(self.epochs):
             result_sementara_perkalian_dan_tambah_neuron = {}
             result_sementara_aktivasi = {}
@@ -354,11 +374,6 @@ class Dense:
                 # Menghitung Akurasi
                 accuraacy_input = DenseSupport.accuracy(X_input_transpose.T, y_input)
                 acc.append(accuraacy_input)
-
-
-                # Loss derivative
-                # loss_derivative = DenseSupport.loss_derivative(X_input_transpose.T, y_input)
-                # print(loss_derivative.shape)
 
                 # Backpropagation
                 # print(result_sementara_aktivasi)
@@ -412,6 +427,15 @@ class Dense:
                     # print(result_weight_baru[int(i_layer)].shape)
                     self.weight[int(i_layer)] = self.weight[int(i_layer)] - 0.01 * result_weight_baru[int(i_layer)]
                     self.bias[int(i_layer)] = self.bias[int(i_layer)] - 0.01 * result_bias_baru[int(i_layer)]
+
+                ulangAwal = ulangAwal + 1
+                ProgressBar.printProgressBar(awal=ulangAwal, akhir=ulangAkhir, prefix='Training:')
+
+                if iterasi % 100 == 0:
+                    ulangAwal = 0
+                    ulangAkhir = 100
+                    print()
+                    print("(", (iterasi), "/", self.epochs, ")", "loss : ", loss_input, "Train Accuracy : ", accuraacy_input)
 
         if(train):
             np.save('model/weight', self.weight)
